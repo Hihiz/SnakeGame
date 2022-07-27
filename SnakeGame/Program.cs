@@ -13,6 +13,9 @@ namespace SnakeGame
 
         private const ConsoleColor BorderColor = ConsoleColor.Gray;
 
+        private const ConsoleColor HeadColor = ConsoleColor.DarkBlue;
+        private const ConsoleColor BodyColor = ConsoleColor.Cyan;
+
         static void Main(string[] args)
         {
             SetWindowSize(ScreenWidth, ScreenHeight);
@@ -20,6 +23,8 @@ namespace SnakeGame
             CursorVisible = false;
 
             DrawBorder();
+
+            var snake = new Snake(10, 5, );
 
             ReadKey();
         }

@@ -24,6 +24,28 @@ namespace SnakeGame
             {
                 Body.Enqueue(new Pixel(Head.X - i - 1, initialY, _bodyColor));
             }
+
+            Draw();
+        }
+
+        public void Draw()
+        {
+            Head.Draw();
+
+            foreach (Pixel pixel in Body)
+            {
+                pixel.Draw();
+            }
+        }
+
+        public void Clear()
+        {
+            Head.Clear();
+
+            foreach (Pixel pixel in Body)
+            {
+                pixel.Clear();
+            }
         }
     }
 }
