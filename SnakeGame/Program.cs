@@ -24,7 +24,7 @@ namespace SnakeGame
 
             DrawBorder();
 
-            var snake = new Snake(10, 5, );
+            var snake = new Snake(10, 5, HeadColor, BodyColor);
 
             ReadKey();
         }

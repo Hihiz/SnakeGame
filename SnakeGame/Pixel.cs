@@ -23,6 +23,8 @@ namespace SnakeGame
 
         public void Draw()
         {
+            Console.ForegroundColor = Color;
+
             for (int x = 0; x < PixelSize; x++)
             {
                 for (int y = 0; y < PixelSize; y++)

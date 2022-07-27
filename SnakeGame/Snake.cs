@@ -14,6 +14,23 @@ namespace SnakeGame
         public Pixel Head { get; private set; }
         public Queue<Pixel> Body { get; } = new Queue<Pixel>();
 
+        public void Move(Direction direction)
+        {
+            Clear();
+
+            Body.Enqueue(new Pixel(Head.X, Head.Y, _bodyColor));
+            Body.Dequeue();
+
+            Head = direction switch
+            {
+                Direction.Right => new Pixel(Head.X + 1, Head.Y, _headColor),
+                Direction.Left => new Pixel(Head.X - 1, Head.Y, _headColor),
+                Direction.Up => new Pixel(Head.X, Head.Y - 1, _headColor),
+                Direction.Down => new Pixel(Head.X, Head.Y + 1, _headColor),
+                _ => Head
+            };
+        }
+
         public Snake(int initialX, int initialY, ConsoleColor headColor, ConsoleColor bodyColor, int bodyLength = 3)
         {
             _headColor = headColor;
@@ -26,6 +43,7 @@ namespace SnakeGame
             }
 
             Draw();
+
         }
 
         public void Draw()
