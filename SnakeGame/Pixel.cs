@@ -37,8 +37,14 @@ namespace SnakeGame
 
         public void Clear()
         {
-            Console.SetCursorPosition(X, Y);
-            Console.Write(' ');
+            for (int x = 0; x < PixelSize; x++)
+            {
+                for (int y = 0; y < PixelSize; y++)
+                {
+                    Console.SetCursorPosition(X * PixelSize + x, Y * PixelSize + y);
+                    Console.Write(' ');
+                }
+            }
         }
     }
 }
