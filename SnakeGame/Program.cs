@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static System.Console;
 
 namespace SnakeGame
@@ -14,7 +15,7 @@ namespace SnakeGame
         private const int ScreenWidth = MapWidth * 3;
         private const int ScreenHeight = MapHeight * 3;
 
-        private const int FrameMs = 200;
+        private const int FrameMilliseconds = 200;
 
         private const ConsoleColor BorderColor = ConsoleColor.Gray;
 
@@ -53,6 +54,9 @@ namespace SnakeGame
             Pixel food = GenFood(snake);
             food.Draw();
 
+            int score = 0;
+
+            int lagMs = 0;
             Stopwatch sw = new Stopwatch();
 
             while (true)
@@ -60,23 +64,42 @@ namespace SnakeGame
                 sw.Restart();
                 Direction oldMovement = currentMovement;
 
-                while (sw.ElapsedMilliseconds <= FrameMs)
+                while (sw.ElapsedMilliseconds <= FrameMilliseconds)
                 {
                     if (currentMovement == oldMovement)
                         currentMovement = ReadMovement(currentMovement);
                 }
 
-                snake.Move(currentMovement);
+                if (snake.Head.X == food.X && snake.Head.Y == food.Y)
+                {
+                    snake.Move(currentMovement, true);
+
+                    food = GenFood(snake);
+                    food.Draw();
+
+                    score++;
+
+                    Task.Run(() => Beep(1200, 200));
+                }
+                else
+                {
+                    snake.Move(currentMovement);
+                }
 
                 if (snake.Head.X == MapWidth - 1 || snake.Head.X == 0 || snake.Head.Y == MapHeight - 1 || snake.Head.Y == 0
                     || snake.Body.Any(b => b.X == snake.Head.X && b.Y == snake.Head.Y))
                     break;
+
+                lagMs = (int)sw.ElapsedMilliseconds;
             }
 
             snake.Clear();
+            food.Clear();
 
             SetCursorPosition(ScreenWidth / 3, ScreenHeight / 2);
-            WriteLine("Game over");
+            WriteLine($"Game over, score {score}");
+
+            Task.Run(() => Beep(200, 600));
         }
 
         static Pixel GenFood(Snake snake)
@@ -86,11 +109,12 @@ namespace SnakeGame
             do
             {
                 food = new Pixel(rnd.Next(1, MapWidth - 2), rnd.Next(1, MapHeight - 2), FoodColor);
-            } while (snake.Head.X == food.X && snake.Head.Y == food.Y
-                      || snake.Body.Any(b => b.X == food.X && b.Y == food.Y));
+            } while (snake.Head.X == food.X && snake.Head.Y == food.Y ||
+                     snake.Body.Any(b => b.X == food.X && b.Y == food.Y));
 
             return food;
         }
+
 
         static Direction ReadMovement(Direction currentDirection)
         {
