@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SnakeGame
 {
@@ -10,6 +7,21 @@ namespace SnakeGame
     {
         private readonly ConsoleColor _headColor;
         private readonly ConsoleColor _bodyColor;
+
+        public Snake(int initialX, int initialY, ConsoleColor headColor, ConsoleColor bodyColor, int bodyLength = 3)
+        {
+            _headColor = headColor;
+            _bodyColor = bodyColor;
+
+            Head = new Pixel(initialX, initialY, headColor);
+
+            for (int i = bodyLength; i >= 0; i--)
+            {
+                Body.Enqueue(new Pixel(Head.X - i - 1, initialY, _bodyColor));
+            }
+
+            Draw();
+        }
 
         public Pixel Head { get; private set; }
         public Queue<Pixel> Body { get; } = new Queue<Pixel>();
@@ -29,21 +41,8 @@ namespace SnakeGame
                 Direction.Down => new Pixel(Head.X, Head.Y + 1, _headColor),
                 _ => Head
             };
-        }
-
-        public Snake(int initialX, int initialY, ConsoleColor headColor, ConsoleColor bodyColor, int bodyLength = 3)
-        {
-            _headColor = headColor;
-            _bodyColor = bodyColor;
-            Head = new Pixel(initialX, initialY, _headColor);
-
-            for (int i = 0; i < bodyLength; i++)
-            {
-                Body.Enqueue(new Pixel(Head.X - i - 1, initialY, _bodyColor));
-            }
 
             Draw();
-
         }
 
         public void Draw()

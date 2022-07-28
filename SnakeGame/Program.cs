@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using static System.Console;
 
 namespace SnakeGame
@@ -11,10 +13,12 @@ namespace SnakeGame
         private const int ScreenWidth = MapWidth * 3;
         private const int ScreenHeight = MapHeight * 3;
 
+        private const int FrameMs = 200;
+
         private const ConsoleColor BorderColor = ConsoleColor.Gray;
 
-        private const ConsoleColor HeadColor = ConsoleColor.DarkBlue;
         private const ConsoleColor BodyColor = ConsoleColor.Cyan;
+        private const ConsoleColor HeadColor = ConsoleColor.DarkBlue;
 
         static void Main(string[] args)
         {
@@ -24,9 +28,55 @@ namespace SnakeGame
 
             DrawBorder();
 
+            Direction currentMovement = Direction.Right;
+
             var snake = new Snake(10, 5, HeadColor, BodyColor);
 
+            Stopwatch sw = new Stopwatch();
+
+            while (true)
+            {
+                sw.Restart();
+                Direction oldMovement = currentMovement;
+
+                while (sw.ElapsedMilliseconds <= FrameMs)
+                {
+                    if (currentMovement == oldMovement)
+                        currentMovement = ReadMovement(currentMovement);
+                }
+
+                snake.Move(currentMovement);
+
+                if (snake.Head.X == MapWidth - 1 || snake.Head.X == 0 || snake.Head.Y == MapHeight - 1 || snake.Head.Y == 0
+                    || snake.Body.Any(b => b.X == snake.Head.X && b.Y == snake.Head.Y))
+                    break;
+            }
+
+            snake.Clear();
+
+            SetCursorPosition(ScreenWidth / 3, ScreenHeight / 2);
+            WriteLine("Game over");
+
             ReadKey();
+        }
+
+        static Direction ReadMovement(Direction currentDirection)
+        {
+            if (!KeyAvailable)
+                return currentDirection;
+
+            ConsoleKey key = ReadKey(true).Key;
+
+            currentDirection = key switch
+            {
+                ConsoleKey.UpArrow when currentDirection != Direction.Down => Direction.Up,
+                ConsoleKey.DownArrow when currentDirection != Direction.Up => Direction.Down,
+                ConsoleKey.LeftArrow when currentDirection != Direction.Right => Direction.Left,
+                ConsoleKey.RightArrow when currentDirection != Direction.Left => Direction.Right,
+                _ => currentDirection
+            };
+
+            return currentDirection;
         }
 
         static void DrawBorder()
