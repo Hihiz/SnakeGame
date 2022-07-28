@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using static System.Console;
 
 namespace SnakeGame
@@ -17,8 +18,12 @@ namespace SnakeGame
 
         private const ConsoleColor BorderColor = ConsoleColor.Gray;
 
-        private const ConsoleColor BodyColor = ConsoleColor.Cyan;
         private const ConsoleColor HeadColor = ConsoleColor.DarkBlue;
+        private const ConsoleColor BodyColor = ConsoleColor.Cyan;
+
+        private const ConsoleColor FoodColor = ConsoleColor.Green;
+
+        private static readonly Random rnd = new Random();
 
         static void Main(string[] args)
         {
@@ -26,11 +31,27 @@ namespace SnakeGame
             SetBufferSize(ScreenWidth, ScreenHeight);
             CursorVisible = false;
 
+            while (true)
+            {
+                StartGame();
+
+                Thread.Sleep(1000);
+                ReadKey();
+            }
+        }
+
+        static void StartGame()
+        {
+            Clear();
+
             DrawBorder();
 
             Direction currentMovement = Direction.Right;
 
             var snake = new Snake(10, 5, HeadColor, BodyColor);
+
+            Pixel food = GenFood(snake);
+            food.Draw();
 
             Stopwatch sw = new Stopwatch();
 
@@ -56,8 +77,19 @@ namespace SnakeGame
 
             SetCursorPosition(ScreenWidth / 3, ScreenHeight / 2);
             WriteLine("Game over");
+        }
 
-            ReadKey();
+        static Pixel GenFood(Snake snake)
+        {
+            Pixel food;
+
+            do
+            {
+                food = new Pixel(rnd.Next(1, MapWidth - 2), rnd.Next(1, MapHeight - 2), FoodColor);
+            } while (snake.Head.X == food.X && snake.Head.Y == food.Y
+                      || snake.Body.Any(b => b.X == food.X && b.Y == food.Y));
+
+            return food;
         }
 
         static Direction ReadMovement(Direction currentDirection)
